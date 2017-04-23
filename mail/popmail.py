@@ -18,7 +18,7 @@ class MailConn:
         self.methodConn = methodConn
         self.handle = ''
         self.mailcount = ''
-        self.inbox = []
+        self.inbox = [] #取邮件
 
     def popconn(self):
         if self.methodConn == 'SSL':
@@ -42,6 +42,11 @@ class MailConn:
                 raise '连接错误'
 
     def userauth(self):
+
+        """
+        用户认证
+        :return:邮件数量
+        """
         auth = self.popconn()
         try:
             auth.user(self.user)
@@ -57,7 +62,7 @@ class MailConn:
 
     def getmail(self, serial=None):
         """
-        :param serial: 切片取
+        :param serial: 切片取邮件
         :return:
         """
 
@@ -68,7 +73,6 @@ class MailConn:
                 for i in range(1,count+1):
                     # time.sleep(0.05)
                     msg = mailbox.retr(i)
-                    # print msg
                     self.inbox.append(msg)
             if serial:
                 for i in range(serial[0],serial[1]):
