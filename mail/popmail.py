@@ -9,7 +9,7 @@ class MailConn:
 
     def __init__(self,host,user,pw,port,methodConn='SSL'):
         """
-        inbox：收件箱，必须先执行getmail（），收件箱才放入邮件
+        inbox：收件箱，必须先执行getmail（），收件箱才放入邮件inbox
         """
         self.host = host
         self.user = user
@@ -18,7 +18,7 @@ class MailConn:
         self.methodConn = methodConn
         self.handle = ''
         self.mailcount = ''
-        self.inbox = [] #取邮件
+        self.inbox = []
 
     def popconn(self):
         if self.methodConn == 'SSL':
