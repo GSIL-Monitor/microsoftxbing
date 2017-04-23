@@ -9,7 +9,7 @@ class MailConn:
 
     def __init__(self,host,user,pw,port,methodConn='SSL'):
         """
-        inbox：收件箱，必须先执行getmail（），收件箱才放入邮件
+        inbox：收件箱，必须先执行getmail（），收件箱才放入邮件inbox
         """
         self.host = host
         self.user = user
@@ -18,7 +18,7 @@ class MailConn:
         self.methodConn = methodConn
         self.handle = ''
         self.mailcount = ''
-        self.inbox = [] #取邮件
+        self.inbox = []
 
     def popconn(self):
         if self.methodConn == 'SSL':
@@ -65,17 +65,16 @@ class MailConn:
         :param serial: 切片取邮件
         :return:
         """
-
         if self.handle:
             mailbox = self.handle
             count = self.mailcount
-            if not serial:
-                for i in range(1,count+1):
-                    # time.sleep(0.05)
-                    msg = mailbox.retr(i)
-                    self.inbox.append(msg)
             if serial:
                 for i in range(serial[0],serial[1]):
+                    msg = mailbox.retr(i)
+                    self.inbox.append(msg)
+            else:
+                for i in range(1,count+1):
+                    # time.sleep(0.05)
                     msg = mailbox.retr(i)
                     self.inbox.append(msg)
 
