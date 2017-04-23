@@ -65,17 +65,16 @@ class MailConn:
         :param serial: 切片取邮件
         :return:
         """
-
         if self.handle:
             mailbox = self.handle
             count = self.mailcount
-            if not serial:
-                for i in range(1,count+1):
-                    # time.sleep(0.05)
-                    msg = mailbox.retr(i)
-                    self.inbox.append(msg)
             if serial:
                 for i in range(serial[0],serial[1]):
+                    msg = mailbox.retr(i)
+                    self.inbox.append(msg)
+            else:
+                for i in range(1,count+1):
+                    # time.sleep(0.05)
                     msg = mailbox.retr(i)
                     self.inbox.append(msg)
 
