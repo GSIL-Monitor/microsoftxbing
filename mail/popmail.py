@@ -88,4 +88,4 @@ if __name__ == '__main__':
     count = st.userauth()
     print count
     st.getmail(serial=(916,918))
-    print st.inbox
+    print type(st.inbox)
