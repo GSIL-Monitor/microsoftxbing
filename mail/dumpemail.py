@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 from email import *
+
 import StringIO
 from popmail import MailConn
 import sys
@@ -9,7 +10,7 @@ sys.setdefaultencoding('gbk')
 
 class DumpMail:
 
-    def __init__(self):
+    def __init__(self,):
         pass
 
     def dump(self):
@@ -23,7 +24,7 @@ count = st.userauth()
 st.getmail(serial=(2,3))
 list1 = st.inbox
 messages = list1[0][1]
-cont = '\r'.join(messages)
+cont = '\r'.join(messages).decode('utf-8')
 msg = parser.Parser().parsestr(cont)
 for i in msg.walk():
     if not i.is_multipart():
@@ -52,6 +53,18 @@ for i in msg.walk():
                 mailContent = i.get_payload(decode=True)
             else:
                 mailContent = i.get_payload(decode=True)
-print (mailContent, suffix)
-# print msg.get("To")
-# print msg.get('from')
+
+
+content_type = msg.get('Content-Type', '').lower()
+pos = content_type.find('charset=')
+subject = msg.get('subject')
+sender = Header.decode_header(msg.get('from'))
+to = utils.parseaddr(msg.get('from'))
+# print subject
+# print sender
+# print to
+# print to[0]
+deName = Header.decode_header(to)[0]
+addr = Utils.parseaddr(msg.get("from"))[0]
+print "addr:{}".format(addr)
+print unicode(Header.decode_header(addr)[0][0],Header.decode_header(addr)[0][1])

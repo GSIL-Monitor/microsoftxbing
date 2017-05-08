@@ -2,14 +2,17 @@
 import poplib
 import MySQLdb,time
 import sys
+reload(sys)
+sys.setdefaultencoding('gbk')
 import multiprocessing
+from email import *
 
 
 class MailConn:
 
     def __init__(self,host,user,pw,port,methodConn='SSL'):
         """
-        inbox：收件箱，必须先执行getmail（），收件箱才放入邮件inbox
+        inbox：收件箱，先执行getmail，收件箱才放入邮件inbox
         """
         self.host = host
         self.user = user
@@ -82,10 +85,45 @@ class MailConn:
             self.userauth()
             self.getmail()
 
+    def dumpmail(self):
+        recipient = ''
+        recipient_addr = ''
+        sender = ''
+        sender_addr = ''
+        subjects = ''
+        text = ''
+        # msg = self.inbox[0][1]
+        cont = '\r'.join(self.inbox[0][1]).decode('utf-8')
+        msg = parser.Parser().parsestr(cont)
+
+        #收件人解析
+        recipient_cont = utils.parseaddr(msg.get('to'))
+        # print recipient_cont
+        recipient_addr = recipient_cont[1]
+        deName = Header.decode_header(recipient_cont[0])
+        recipient = unicode(deName[0][0],deName[0][1])
+
+        #发件人解析
+        sender_cont = utils.parseaddr(msg.get('from'))
+        # print recipient_cont
+        sender_addr = sender_cont[1]
+        deName = Header.decode_header(sender_cont[0])
+        sender = unicode(deName[0][0],deName[0][1])
+
+        #解析标题
+        subjects_cont = utils.parseaddr(msg.get('subject'))
+        deSubjects = Header.decode_header(subjects_cont[1])
+        subjects = unicode(deSubjects[0][0], deSubjects[0][1])
+        # print subjects
+
+        return recipient,recipient_addr,sender,sender_addr,subjects
 
 if __name__ == '__main__':
     st = MailConn(host='pop.exmail.qq.com',user='xb04@datatang.cn',pw='Zaixian2015',port=995)
     count = st.userauth()
-    print count
-    st.getmail(serial=(916,918))
-    print type(st.inbox)
+    # print count
+    st.getmail(serial=(4,5))
+    ret = st.dumpmail()
+    for i in ret:
+        # print i
+        pass
