@@ -62,11 +62,12 @@ class MailConn:
             print e
             raise '用户名或密码错误'
 
-    def getmail(self, serial=None):
+    def __getmail(self, serial=None):
         """
         :param serial: 切片取邮件
         :return:
         """
+        mail = []
         if not isinstance(serial,tuple):
             raise '参数错误,应为元组类型'
         for i in serial:
@@ -82,26 +83,27 @@ class MailConn:
             if serial:
                 for i in range(serial[0],serial[1]):
                     msg = mailbox.retr(i)
-                    self.inbox.append(msg)
+                    mail.append(msg)
             else:
                 for i in range(1,count+1):
                     # time.sleep(0.05)
                     msg = mailbox.retr(i)
-                    self.inbox.append(msg)
-
+                    mail.append(msg)
         else:
             self.userauth()
             self.getmail()
 
-    def mailmsg(self):
+        return mail
+
+    def mailmsg(self,serial):
         # recipient = ''
         # recipient_addr = ''
         # sender = ''
         # sender_addr = ''
         # subjects = ''
         # text = ''
-        # cont = '\r'.join(self.inbox[0][1]).decode('utf-8')
-        cont = '\r'.join(self.inbox[0][1])
+        inbox = self.__getmail(serial)
+        cont = '\r'.join(inbox[0][1])
         msg = parser.Parser().parsestr(cont)
         return msg
 
@@ -133,10 +135,6 @@ if __name__ == '__main__':
     st = MailConn(host='pop.exmail.qq.com',user='xb04@datatang.cn',pw='Zaixian2015',port=995)
     count = st.userauth()
     # print count[1]
-    st.getmail(serial=(18,19))
-    print st.inbox[0][1]
-    # print st.dumpmail()
-    # ret = st.dumpmail()
-    # for i in ret:
-    #     print i
-    #     pass
+    print st.mailmsg(serial=(18,19))
+    # print st.getmail(serial=(18,19))
+

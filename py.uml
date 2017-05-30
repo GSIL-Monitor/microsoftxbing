@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>Python</ID>
+  <OriginalElement>#D:/microsoftxbing/mail/parsemail.py</OriginalElement>
+  <nodes>
+    <node x="-150.0" y="-43.0">mail.parsemail.ParseEmail</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Hierarchic Group" zoom="1.0" x="135.5" y="23.0" />
+  <SelectedNodes>
+    <node>mail.parsemail.ParseEmail</node>
+  </SelectedNodes>
+  <Categories />
+</Diagram>
+

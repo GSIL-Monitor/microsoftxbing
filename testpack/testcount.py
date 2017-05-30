@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from email.header import decode_header
 from email.utils import parseaddr
-from popmail import *
+from mail.popmail import *
 from basefunc.strdecoding import Decode4Str
 import chardet
 
@@ -58,17 +58,28 @@ if __name__ == '__main__':
     st = MailConn(host='pop.exmail.qq.com',user='xb04@datatang.cn',pw='Zaixian2015',port=995)
     count = st.userauth()
     print '总邮件数:{}'.format(count[0])
-    msg = st.mailmsg(serial=(463,464))
-    mail = ParseEmail(msg)
-    ret = mail.mailstruc()
-    print ret[1]
-    filelog = open('mailtest.log','w+')
+    log = open('mail.log','w+')
 
-    print isinstance(ret[0], unicode)
-    filelog.write(ret[0]+'\r')
-    filelog.write(''.join(ret[1]+'\r'))
-    filelog.write(ret[2])
-    # print unicode(ret[0],'utf-8')
-    filelog.flush()
-    filelog.close()
+    mailcont = 0
+    for i in range(count[0],1,-1):
+        if i == 0:
+            break
+        msg = st.mailmsg(serial=(i-1,i))
+        mail = ParseEmail(msg)
+        ret = mail.mailstruc()
+        # print len(ret)
+        for i in ret:
+            try:
+                if not isinstance(i, unicode):
+                    i = unicode(i,'utf-8',errors='ignore')
+                log.write(i + '\r')
+            except Exception as e:
+                log.write(str(i.encode('utf-8', 'ignore')) + '\r')
+                # log.write(str(e) + '\r')
+        mailcont += 1
+        mails = int(count[0]) - mailcont
+        log.write('======%s======\r\n' % str(mails))
+        log.flush()
+    log.close()
 
+    count[1].quit()
