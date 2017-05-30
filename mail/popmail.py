@@ -19,9 +19,9 @@ class MailConn:
         self.pw = pw
         self.port = port
         self.methodConn = methodConn
-        self.handle = ''
         self.mailcount = ''
         self.inbox = []
+        self.auth = ''
 
     def popconn(self):
         if self.methodConn == 'SSL':
@@ -48,17 +48,16 @@ class MailConn:
 
         """
         用户认证
-        :return:邮件数量
+        :return:邮件数量,连接
         """
-        auth = self.popconn()
+        self.auth = self.popconn()
         try:
-            auth.user(self.user)
-            auth.pass_(self.pw)
-            ret = auth.stat()
-            print '共{}封邮件'.format(ret[0])
+            self.auth.user(self.user)
+            self.auth.pass_(self.pw)
+            ret = self.auth.stat()
+            # print '共{}封邮件'.format(ret[0])
             self.mailcount = ret[0]
-            self.handle = auth
-            return ret[0]
+            return ret[0],self.auth  # 返回邮件数量和授权连接
         except Exception as e:
             print e
             raise '用户名或密码错误'
@@ -68,8 +67,17 @@ class MailConn:
         :param serial: 切片取邮件
         :return:
         """
-        if self.handle:
-            mailbox = self.handle
+        if not isinstance(serial,tuple):
+            raise '参数错误,应为元组类型'
+        for i in serial:
+            if not isinstance(i, int):
+                raise '参数错误，应为整型元组'
+        if serial[1]-serial[0] != 1:
+            raise '参数错误，一次只取一封邮件'
+            # TODO 2.0再增加功能解析多封邮件
+
+        if self.auth:
+            mailbox = self.auth
             count = self.mailcount
             if serial:
                 for i in range(serial[0],serial[1]):
@@ -81,49 +89,54 @@ class MailConn:
                     msg = mailbox.retr(i)
                     self.inbox.append(msg)
 
-        elif not self.handle:
+        else:
             self.userauth()
             self.getmail()
 
-    def dumpmail(self):
-        recipient = ''
-        recipient_addr = ''
-        sender = ''
-        sender_addr = ''
-        subjects = ''
-        text = ''
-        # msg = self.inbox[0][1]
-        cont = '\r'.join(self.inbox[0][1]).decode('utf-8')
+    def mailmsg(self):
+        # recipient = ''
+        # recipient_addr = ''
+        # sender = ''
+        # sender_addr = ''
+        # subjects = ''
+        # text = ''
+        # cont = '\r'.join(self.inbox[0][1]).decode('utf-8')
+        cont = '\r'.join(self.inbox[0][1])
         msg = parser.Parser().parsestr(cont)
+        return msg
 
-        #收件人解析
-        recipient_cont = utils.parseaddr(msg.get('to'))
-        # print recipient_cont
-        recipient_addr = recipient_cont[1]
-        deName = Header.decode_header(recipient_cont[0])
-        recipient = unicode(deName[0][0],deName[0][1])
+        # TODO 收件人解析 放到另外一个方法里
+        # recipient_cont = utils.parseaddr(msg.get('to'))
+        # # print recipient_cont
+        # recipient_addr = recipient_cont[1]
+        # deName = Header.decode_header(recipient_cont[0])
+        # if deName[0][1] != None:
+        #     recipient = unicode(deName[0][0],deName[0][1])
+        #
+        # #发件人解析
+        # sender_cont = utils.parseaddr(msg.get('from'))
+        # # print recipient_cont
+        # sender_addr = sender_cont[1]
+        # deName = Header.decode_header(sender_cont[0])
+        # sender = unicode(deName[0][0],deName[0][1])
+        #
+        # #解析标题
+        # subjects_cont = utils.parseaddr(msg.get('subject'))
+        # deSubjects = Header.decode_header(subjects_cont[1])
+        # if deSubjects[0][1] != None:
+        #     subjects = unicode(deSubjects[0][0], deSubjects[0][1])
+        # # print subjects
+        # return recipient,recipient_addr,sender,sender_addr,subjects
 
-        #发件人解析
-        sender_cont = utils.parseaddr(msg.get('from'))
-        # print recipient_cont
-        sender_addr = sender_cont[1]
-        deName = Header.decode_header(sender_cont[0])
-        sender = unicode(deName[0][0],deName[0][1])
-
-        #解析标题
-        subjects_cont = utils.parseaddr(msg.get('subject'))
-        deSubjects = Header.decode_header(subjects_cont[1])
-        subjects = unicode(deSubjects[0][0], deSubjects[0][1])
-        # print subjects
-
-        return recipient,recipient_addr,sender,sender_addr,subjects
 
 if __name__ == '__main__':
     st = MailConn(host='pop.exmail.qq.com',user='xb04@datatang.cn',pw='Zaixian2015',port=995)
     count = st.userauth()
-    # print count
-    st.getmail(serial=(4,5))
-    ret = st.dumpmail()
-    for i in ret:
-        # print i
-        pass
+    # print count[1]
+    st.getmail(serial=(18,19))
+    print st.inbox[0][1]
+    # print st.dumpmail()
+    # ret = st.dumpmail()
+    # for i in ret:
+    #     print i
+    #     pass
